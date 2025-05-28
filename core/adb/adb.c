@@ -1280,7 +1280,8 @@ int adb_main(int is_daemon, int server_port)
         header.pid = 0;
         cap[CAP_TO_INDEX(CAP_SYS_BOOT)].effective |= CAP_TO_MASK(CAP_SYS_BOOT);
         cap[CAP_TO_INDEX(CAP_SYS_BOOT)].permitted |= CAP_TO_MASK(CAP_SYS_BOOT);
-        capset(&header, cap);
+        /*capset(&header, cap);*/
+        syscall(SYS_capset, &header, cap);
 
         D("Local port disabled\n");
     } else {
