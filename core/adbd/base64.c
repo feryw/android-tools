@@ -65,6 +65,7 @@ __RCSID("$NetBSD: base64.c,v 1.8 2002/11/11 01:15:17 thorpej Exp $");
 
 #include <stdlib.h>
 #include <string.h>
+#include "base64.h"
 
 static const char Base64[] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
