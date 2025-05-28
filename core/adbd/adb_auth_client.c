@@ -25,6 +25,7 @@
 #include "adb_auth.h"
 #include "fdevent.h"
 #include "mincrypt/rsa.h"
+#include "base64.h"
 
 #define TRACE_TAG TRACE_AUTH
 
