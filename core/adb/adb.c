@@ -36,7 +36,8 @@
 #if !ADB_HOST
 #include <private/android_filesystem_config.h>
 #include <linux/capability.h>
-#include <linux/prctl.h>
+#include <sys/syscall.h>
+#include <sys/prctl.h>
 #include <sys/mount.h>
 #else
 #include "usb_vendors.h"
