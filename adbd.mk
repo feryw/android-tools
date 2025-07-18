@@ -53,7 +53,7 @@ OBJS= $(patsubst %, %.o, $(basename $(SRCS)))
 all: adbd
 
 adbd: $(OBJS)
-	$(CC) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
+	$(CC) -o -static $@ $(LDFLAGS) $(OBJS) $(LIBS)
 
 #%.o:
 #	echo $(OBJS)
