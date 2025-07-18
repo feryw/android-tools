@@ -1,4 +1,4 @@
-name: Build Android Tools in Alpine armhf
+name: Build Android Tools in Alpine chroot (ARMv7)
 
 on:
   push:
@@ -7,35 +7,42 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-in-container:
+  build-in-chroot:
     runs-on: ubuntu-22.04-arm
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Install Docker
+      - name: Prepare chroot environment
         run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
+          sudo mkdir -p /opt/chroot/alpine-armhf/src
+          sudo cp -r . /opt/chroot/alpine-armhf/src
+          sudo mount -t proc none /opt/chroot/alpine-armhf/proc
+          sudo mount -t sysfs none /opt/chroot/alpine-armhf/sys
+          sudo mount --bind /dev /opt/chroot/alpine-armhf/dev
+          sudo mount --bind /dev/pts /opt/chroot/alpine-armhf/dev/pts
 
-      - name: Build in Alpine armhf container
+      - name: Build inside chroot
         run: |
-          docker run --rm -v $PWD:/src -w /src \
-            linuxcontainers/alpine/3.22/armhf/default \
-            sh -c "
-              apk update &&
-              apk add build-base musl-dev zlib-dev openssl-dev pkgconfig &&
-              make -f adbd.mk clean all &&
-              make -f adb.mk clean all &&
-              make -f fastboot.mk clean all &&
-              mkdir -p output/bin &&
-              cp adbd adb fastboot output/bin/ &&
-              tar -czvf android-tools-armhf-${GITHUB_REF##*/}.tar.gz -C output bin
-            "
+          sudo chroot /opt/chroot/alpine-armhf /bin/sh -c "
+            apk update &&
+            apk add build-base musl-dev zlib-dev openssl-dev pkgconfig &&
+            cd /src &&
+            make -f adbd.mk clean all &&
+            make -f adb.mk clean all &&
+            make -f fastboot.mk clean all &&
+            mkdir -p output/bin &&
+            cp adbd adb fastboot output/bin/ &&
+            tar -czvf android-tools-armhf-\${GITHUB_REF##*/}.tar.gz -C output bin
+          "
+
+      - name: Copy artifact from chroot
+        run: |
+          cp /opt/chroot/alpine-armhf/src/android-tools-armhf-${GITHUB_REF##*/}.tar.gz .
 
       - name: Upload release
         uses: ncipollo/release-action@v1
         with:
           artifacts: android-tools-armhf-${{ github.ref_name }}.tar.gz
-          body: "✅ Built inside Alpine 3.22 armhf container\nIncludes: adb, adbd, fastboot"
+          body: "✅ Built inside Alpine 3.22 armhf chroot\nIncludes: adb, adbd, fastboot"
           tag: ${{ github.ref_name }}
