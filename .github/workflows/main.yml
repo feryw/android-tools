@@ -58,13 +58,17 @@ jobs:
           echo "🚀 Entering chroot and building..."
           sudo chroot /opt/chroot/ubuntu-jammy-armhf /bin/bash -c "
             apt update
-            DEBIAN_FRONTEND=noninteractive apt install -y build-essential pkg-config zlib1g-dev libssl-dev libselinux1-dev
+            DEBIAN_FRONTEND=noninteractive apt install -y build-essential pkg-config zlib1g-dev libssl-dev libselinux1-dev install -y python3-pip binutils patchelf
+            pip3 install staticx
             cd /src
             make -f adbd.mk clean all
             make -f adb.mk clean all
             make -f fastboot.mk clean all
-            mkdir -p /artifacts/bin
-            cp adbd adb fastboot /artifacts/bin/
+            mkdir -p /artifacts/prebin /artifacts/bin
+            cp adbd adb fastboot /artifacts/prebin/
+            staticx /artifacts/prebin/adb /artifacts/bin/adb
+            staticx /artifacts/prebin/adbd /artifacts/bin/adbd
+            staticx /artifacts/prebin/fastboot /artifacts/bin/fastboot
             cd /artifacts
             tar -czvf android-tools-armhf-${GITHUB_REF##*/}.tar.gz bin
           "
@@ -76,6 +80,6 @@ jobs:
       - name: 🚀 Upload release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: android-tools-armhf-${{ github.ref_name }}.tar.gz
-          body: "✅ Built inside Ubuntu Jammy armhf chroot\nIncludes: adb, adbd, fastboot binaries only"
+          artifacts: static android-tools-armhf-${{ github.ref_name }}.tar.gz
+          body: "✅ Built inside Ubuntu Jammy armhf chroot\nIncludes: adb, adbd, fastboot static binaries only"
           tag: ${{ github.ref_name }}
