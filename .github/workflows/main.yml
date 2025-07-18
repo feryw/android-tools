@@ -67,17 +67,15 @@ jobs:
             mkdir -p /artifacts/prebin 
             mkdir -p /artifacts/bin
             cp adbd adb fastboot /artifacts/prebin/
-            staticx --debug /artifacts/prebin/adb /artifacts/bin/adb
-            staticx --debug /artifacts/prebin/adbd /artifacts/bin/adbd
-            staticx --debug /artifacts/prebin/fastboot /artifacts/bin/fastboot
+            staticx --strip /artifacts/prebin/adb /artifacts/bin/adb
+            staticx --strip /artifacts/prebin/adbd /artifacts/bin/adbd
+            staticx --strip /artifacts/prebin/fastboot /artifacts/bin/fastboot
             cd /artifacts
             tar -czvf android-tools-armhf-${GITHUB_REF##*/}.tar.gz bin
-            find
           "
 
       - name: 📤 Copy full source tree archive from chroot
         run: |
-          find /opt/chroot/ubuntu-jammy-armhf/artifacts
           cp /opt/chroot/ubuntu-jammy-armhf/artifacts/android-tools-armhf-${GITHUB_REF##*/}.tar.gz .
 
       - name: 🆙 Determine next version tag
