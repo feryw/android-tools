@@ -1,4 +1,4 @@
-name: Build Android Tools in Debian Bookworm chroot (ARMv7)
+name: Build Android Tools in Debian Bookworm armhf chroot
 
 on:
   push:
@@ -8,10 +8,23 @@ on:
 
 jobs:
   build-in-debian-chroot:
-    runs-on: ubuntu-22.04-arm
+    runs-on: ubuntu-22.04-arm64
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
+
+      - name: Fetch and extract Debian Bookworm armhf rootfs
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl jq xz-utils
+
+          mkdir -p /opt/chroot
+          ROOTFS_PATH=$(curl -s https://images.linuxcontainers.org/meta/1.0/index-system | \
+            jq -r '."debian/bookworm/armhf/default".items[0].path')
+          curl -L "https://images.linuxcontainers.org${ROOTFS_PATH}" -o /opt/chroot/rootfs.tar.xz
+
+          mkdir -p /opt/chroot/debian-bookworm-armhf
+          sudo tar -xJf /opt/chroot/rootfs.tar.xz -C /opt/chroot/debian-bookworm-armhf
 
       - name: Prepare chroot environment
         run: |
@@ -26,7 +39,7 @@ jobs:
         run: |
           sudo chroot /opt/chroot/debian-bookworm-armhf /bin/bash -c "
             apt update &&
-            apt install -y build-essential pkg-config zlib1g-dev libssl-dev &&
+            DEBIAN_FRONTEND=noninteractive apt install -y build-essential pkg-config zlib1g-dev libssl-dev &&
             cd /src &&
             make -f adbd.mk clean all &&
             make -f adb.mk clean all &&
@@ -44,5 +57,5 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: android-tools-armhf-${{ github.ref_name }}.tar.gz
-          body: "✅ Built inside Debian Bookworm armhf chroot\nIncludes: adb, adbd, fastboot"
+          body: "✅ Built inside Debian Bookworm armhf chroot (via LinuxContainers.org)\nIncludes: adb, adbd, fastboot"
           tag: ${{ github.ref_name }}
