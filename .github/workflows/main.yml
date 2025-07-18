@@ -1,4 +1,4 @@
-name: Build Android Tools in Debian Bookworm armhf chroot
+name: Build Android Tools in Ubntu Jammy armhf chroot
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 jobs:
   build-in-debian-chroot:
     runs-on: ubuntu-22.04
-    name: Build in Debian Bookworm armhf chroot
+    name: Build in Ubuntu Jammy armhf chroot
     steps:
       - name: 🧾 Checkout source
         uses: actions/checkout@v3
@@ -22,42 +22,36 @@ jobs:
       - name: 📦 Fetch rootfs
         run: |
           echo "📡 Fetching rootfs metadata..."
-          DOWNLOAD_SERVER="images.linuxcontainers.org"
-          DOWNLOAD_INDEX_PATH="/meta/1.0/index-system"
-          DISTRO_ARCH="armhf"
-          DOWNLOAD_DISTRO="debian;bookworm;${DISTRO_ARCH};default"
-          ROTTFS_PATH=
-          ROOTFS_URL="https://$DOWNLOAD_SERVER/images/debian/bookworm/armhf/default/20250715_05:24/rootfs.tar.xz"
-
+          ROOTFS_URL="https://$DOWNLOAD_SERVER//images/ubuntu/jammy/armhf/default/20250715_08:28//rootfs.tar.xz"
           echo "✅ Resolved rootfs URL: $ROOTFS_URL"
 
           mkdir -p /opt/chroot
           curl -L -o /opt/chroot/rootfs.tar.xz "$ROOTFS_URL"
 
           echo "📂 Extracting rootfs..."
-          mkdir -p /opt/chroot/debian-bookworm-armhf
-          sudo tar -xf /opt/chroot/rootfs.tar.xz -C /opt/chroot/debian-bookworm-armhf
+          mkdir -p /opt/chroot/ubuntu-jammy-armhf
+          sudo tar -xf /opt/chroot/rootfs.tar.xz -C /opt/chroot/ubuntu-jammy-armhf
           rm /opt/chroot/rootfs.tar.xz
 
       - name: 🛠️ Prepare chroot environment
         run: |
           echo "📁 Copying source into chroot..."
-          sudo mkdir -p /opt/chroot/debian-bookworm-armhf/src
-          sudo cp -r . /opt/chroot/debian-bookworm-armhf/src
+          sudo mkdir -p /opt/chroot/ubuntu-jammy-armhf/src
+          sudo cp -r . /opt/chroot/ubuntu-jammy-armhf/src
 
           echo "🔗 Mounting system directories..."
           for dir in proc sys dev dev/pts; do
-            sudo mkdir -p /opt/chroot/debian-bookworm-armhf/$dir
-            sudo mount --bind /$dir /opt/chroot/debian-bookworm-armhf/$dir
+            sudo mkdir -p /opt/chroot/ubuntu-jammy-armhf/$dir
+            sudo mount --bind /$dir /opt/chroot/ubuntu-jammy-armhf/$dir
           done
 
           echo "📦 Copying qemu-arm-static into chroot..."
-          sudo cp /usr/bin/qemu-arm-static /opt/chroot/debian-bookworm-armhf/usr/bin/
+          sudo cp /usr/bin/qemu-arm-static /opt/chroot/ubuntu-jammy-armhf/usr/bin/
 
       - name: 🧪 Build inside chroot
         run: |
           echo "🚀 Entering chroot and building..."
-          sudo chroot /opt/chroot/debian-bookworm-armhf /bin/bash -c "
+          sudo chroot /opt/chroot/ubuntu-jammy-armhf /bin/bash -c "
             apt update &&
             DEBIAN_FRONTEND=noninteractive apt install -y build-essential pkg-config zlib1g-dev libssl-dev &&
             cd /src &&
@@ -71,7 +65,7 @@ jobs:
 
       - name: 📤 Copy full source tree archive from chroot
         run: |
-          cp /opt/chroot/debian-bookworm-armhf/src/android-tools-armhf-full-${GITHUB_REF##*/}.tar.gz .
+          cp /opt/chroot/ubuntu-jammy-armhf/src/android-tools-armhf-full-${GITHUB_REF##*/}.tar.gz .
 
       - name: 🚀 Upload release
         uses: ncipollo/release-action@v1
