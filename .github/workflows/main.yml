@@ -72,7 +72,7 @@ jobs:
 
       - name: 📤 Copy full source tree archive from chroot
         run: |
-          cp /opt/chroot/ubuntu-jammy-armhf/artifacts/bin/adbd .
+          sudo cp /opt/chroot/ubuntu-jammy-armhf/artifacts/bin/adbd .
 
       - name: 🆙 Determine next version tag
         id: version
