@@ -24,9 +24,8 @@ jobs:
           DOWNLOAD_INDEX_PATH="/meta/1.0/index-system"
           DISTRO_ARCH="armhf"
           DOWNLOAD_DISTRO="debian;bookworm;${DISTRO_ARCH};default"
-
-          ROOTFS_URL="https://$DOWNLOAD_SERVER$(curl -fsSL https://$DOWNLOAD_SERVER$DOWNLOAD_INDEX_PATH | \
-            grep \"$DOWNLOAD_DISTRO\" | cut -f6 -d';')/rootfs.tar.xz"
+          ROTTFS_PATH=
+          ROOTFS_URL="https://$DOWNLOAD_SERVER$/images/debian/bookworm/armhf/default/20250715_05:24/rootfs.tar.xz"
 
           echo "✅ Resolved rootfs URL: $ROOTFS_URL"
 
