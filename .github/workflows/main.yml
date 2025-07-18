@@ -64,11 +64,12 @@ jobs:
             make -f adbd.mk clean all
             make -f adb.mk clean all
             make -f fastboot.mk clean all
-            mkdir -p /artifacts/prebin /artifacts/bin
+            mkdir -p /artifacts/prebin 
+            mkdir -p /artifacts/bin
             cp adbd adb fastboot /artifacts/prebin/
-            staticx /artifacts/prebin/adb /artifacts/bin/adb
-            staticx /artifacts/prebin/adbd /artifacts/bin/adbd
-            staticx /artifacts/prebin/fastboot /artifacts/bin/fastboot
+            staticx --debug /artifacts/prebin/adb /artifacts/bin/adb
+            staticx --debug /artifacts/prebin/adbd /artifacts/bin/adbd
+            staticx --debug /artifacts/prebin/fastboot /artifacts/bin/fastboot
             cd /artifacts
             tar -czvf android-tools-armhf-${GITHUB_REF##*/}.tar.gz bin
           "
