@@ -58,7 +58,7 @@ jobs:
           echo "🚀 Entering chroot and building..."
           sudo chroot /opt/chroot/ubuntu-jammy-armhf /bin/bash -c "
             apt update
-            DEBIAN_FRONTEND=noninteractive apt install -y build-essential pkg-config zlib1g-dev libssl-dev libselinux1-dev python3-pip binutils patchelf
+            DEBIAN_FRONTEND=noninteractive apt install -y build-essential pkg-config zlib1g-dev libssl-dev libselinux1-dev python3-pip binutils patchelf python3-pyelftools 
             pip3 install staticx
             cd /src
             make -f adbd.mk clean all
