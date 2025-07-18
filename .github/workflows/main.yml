@@ -1,4 +1,4 @@
-name: Build Android Tools in Ubntu Jammy armhf chroot
+name: Build adbd
 
 on:
   push:
@@ -62,21 +62,15 @@ jobs:
             pip3 install staticx
             cd /src
             make -f adbd.mk clean all
-            make -f adb.mk clean all
-            make -f fastboot.mk clean all
             mkdir -p /artifacts/prebin 
             mkdir -p /artifacts/bin
-            cp adbd adb fastboot /artifacts/prebin/
-            staticx --strip /artifacts/prebin/adb /artifacts/bin/adb
+            cp adbd /artifacts/prebin/
             staticx --strip /artifacts/prebin/adbd /artifacts/bin/adbd
-            staticx --strip /artifacts/prebin/fastboot /artifacts/bin/fastboot
-            cd /artifacts
-            tar -czvf android-tools-armhf-${GITHUB_REF##*/}.tar.gz bin
           "
 
       - name: 📤 Copy full source tree archive from chroot
         run: |
-          cp /opt/chroot/ubuntu-jammy-armhf/artifacts/android-tools-armhf-${GITHUB_REF##*/}.tar.gz .
+          cp /opt/chroot/ubuntu-jammy-armhf/artifacts/bin/adbd .
 
       - name: 🆙 Determine next version tag
         id: version
@@ -96,7 +90,7 @@ jobs:
       - name: 🚀 Upload release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: android-tools-armhf-${{ github.ref_name }}.tar.gz
+          artifacts: adbd
           tag: ${{ env.VERSION_TAG }}
           name: ${{ env.VERSION_TAG }}
-          body: "✅ Built inside Ubuntu Jammy armhf chroot\nIncludes: adb, adbd, fastboot static binaries only"
+          body: "✅ adbd static armv7/armhf binaries only"
