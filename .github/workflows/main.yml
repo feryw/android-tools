@@ -63,18 +63,19 @@ jobs:
             make -f adbd.mk clean all
             make -f adb.mk clean all
             make -f fastboot.mk clean all
-            mkdir -p output/bin
-            cp adbd adb fastboot output/bin/
-            tar -czvf android-tools-armhf-full-\${GITHUB_REF##*/}.tar.gz -C /src .
+            mkdir -p /artifacts/bin
+            cp adbd adb fastboot /artifacts/bin/
+            cd /artifacts
+            tar -czvf android-tools-armhf-${GITHUB_REF##*/}.tar.gz bin
           "
 
       - name: 📤 Copy full source tree archive from chroot
         run: |
-          cp /opt/chroot/ubuntu-jammy-armhf/src/android-tools-armhf-full-${GITHUB_REF##*/}.tar.gz .
+          cp /opt/chroot/ubuntu-jammy-armhf/artifacts/android-tools-armhf-${GITHUB_REF##*/}.tar.gz .
 
       - name: 🚀 Upload release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: android-tools-armhf-full-${{ github.ref_name }}.tar.gz
-          body: "✅ Full source + binaries built inside Debian Bookworm armhf chroot\nIncludes: adb, adbd, fastboot, Makefiles, and all sources"
+          artifacts: android-tools-armhf-${{ github.ref_name }}.tar.gz
+          body: "✅ Built inside Ubuntu Jammy armhf chroot\nIncludes: adb, adbd, fastboot binaries only"
           tag: ${{ github.ref_name }}
