@@ -1,45 +1,41 @@
-name: Build Android Tools
+name: Build Android Tools in Alpine armhf
 
 on:
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
-  build-armhf:
+  build-in-container:
     runs-on: ubuntu-22.04-arm
-    name: Build android-tool
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Install build dependencies
+      - name: Install Docker
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential pkg-config zlib1g-dev libssl-dev
+          sudo apt-get install -y docker.io
 
-      - name: Build adbd
+      - name: Build in Alpine armhf container
         run: |
-          make -f adbd.mk clean all
-          mkdir -p output/bin
-          cp adbd output/bin/
-
-      - name: Build adb
-        run: |
-          make -f adb.mk clean all
-          cp adb output/bin/
-
-      - name: Build fastboot
-        run: |
-          make -f fastboot.mk clean all
-          cp fastboot output/bin/
-
-      - name: Package binaries
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          mkdir -p output/release
-          tar -czvf output/release/android-tools-armhf-${VERSION}.tar.gz -C output bin
+          docker run --rm -v $PWD:/src -w /src \
+            linuxcontainers/alpine/3.22/armhf/default \
+            sh -c "
+              apk update &&
+              apk add build-base musl-dev zlib-dev openssl-dev pkgconfig &&
+              make -f adbd.mk clean all &&
+              make -f adb.mk clean all &&
+              make -f fastboot.mk clean all &&
+              mkdir -p output/bin &&
+              cp adbd adb fastboot output/bin/ &&
+              tar -czvf android-tools-armhf-${GITHUB_REF##*/}.tar.gz -C output bin
+            "
 
       - name: Upload release
         uses: ncipollo/release-action@v1
         with:
-          body: "✅ Android tools compiled for ARMv7 (armhf)\nIncludes: adb, adbd, fastboot"
+          artifacts: android-tools-armhf-${{ github.ref_name }}.tar.gz
+          body: "✅ Built inside Alpine 3.22 armhf container\nIncludes: adb, adbd, fastboot"
           tag: ${{ github.ref_name }}
