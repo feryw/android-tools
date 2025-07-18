@@ -57,14 +57,14 @@ jobs:
         run: |
           echo "🚀 Entering chroot and building..."
           sudo chroot /opt/chroot/ubuntu-jammy-armhf /bin/bash -c "
-            apt update &&
-            DEBIAN_FRONTEND=noninteractive apt install -y build-essential pkg-config zlib1g-dev libssl-dev &&
-            cd /src &&
-            make -f adbd.mk clean all &&
-            make -f adb.mk clean all &&
-            make -f fastboot.mk clean all &&
-            mkdir -p output/bin &&
-            cp adbd adb fastboot output/bin/ &&
+            apt update
+            DEBIAN_FRONTEND=noninteractive apt install -y build-essential pkg-config zlib1g-dev libssl-dev libselinux1-dev
+            cd /src
+            make -f adbd.mk clean all
+            make -f adb.mk clean all
+            make -f fastboot.mk clean all
+            mkdir -p output/bin
+            cp adbd adb fastboot output/bin/
             tar -czvf android-tools-armhf-full-\${GITHUB_REF##*/}.tar.gz -C /src .
           "
 
