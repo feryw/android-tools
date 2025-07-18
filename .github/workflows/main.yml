@@ -1,4 +1,4 @@
-name: Build Android Tools in Alpine chroot (ARMv7)
+name: Build Android Tools in Debian Bookworm chroot (ARMv7)
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-in-chroot:
+  build-in-debian-chroot:
     runs-on: ubuntu-22.04-arm
     steps:
       - name: Checkout source
@@ -15,18 +15,18 @@ jobs:
 
       - name: Prepare chroot environment
         run: |
-          sudo mkdir -p /opt/chroot/alpine-armhf/src
-          sudo cp -r . /opt/chroot/alpine-armhf/src
-          sudo mount -t proc none /opt/chroot/alpine-armhf/proc
-          sudo mount -t sysfs none /opt/chroot/alpine-armhf/sys
-          sudo mount --bind /dev /opt/chroot/alpine-armhf/dev
-          sudo mount --bind /dev/pts /opt/chroot/alpine-armhf/dev/pts
+          sudo mkdir -p /opt/chroot/debian-bookworm-armhf/src
+          sudo cp -r . /opt/chroot/debian-bookworm-armhf/src
+          for dir in proc sys dev dev/pts; do
+            sudo mkdir -p /opt/chroot/debian-bookworm-armhf/$dir
+            sudo mount --bind /$dir /opt/chroot/debian-bookworm-armhf/$dir
+          done
 
       - name: Build inside chroot
         run: |
-          sudo chroot /opt/chroot/alpine-armhf /bin/sh -c "
-            apk update &&
-            apk add build-base musl-dev zlib-dev openssl-dev pkgconfig &&
+          sudo chroot /opt/chroot/debian-bookworm-armhf /bin/bash -c "
+            apt update &&
+            apt install -y build-essential pkg-config zlib1g-dev libssl-dev &&
             cd /src &&
             make -f adbd.mk clean all &&
             make -f adb.mk clean all &&
@@ -38,11 +38,11 @@ jobs:
 
       - name: Copy artifact from chroot
         run: |
-          cp /opt/chroot/alpine-armhf/src/android-tools-armhf-${GITHUB_REF##*/}.tar.gz .
+          cp /opt/chroot/debian-bookworm-armhf/src/android-tools-armhf-${GITHUB_REF##*/}.tar.gz .
 
       - name: Upload release
         uses: ncipollo/release-action@v1
         with:
           artifacts: android-tools-armhf-${{ github.ref_name }}.tar.gz
-          body: "✅ Built inside Alpine 3.22 armhf chroot\nIncludes: adb, adbd, fastboot"
+          body: "✅ Built inside Debian Bookworm armhf chroot\nIncludes: adb, adbd, fastboot"
           tag: ${{ github.ref_name }}
