@@ -14,11 +14,13 @@ jobs:
       - name: 🧾 Checkout source
         uses: actions/checkout@v3
 
-      - name: 📦 Install tools and fetch rootfs
+      - name: 📦 Install QEMU and tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y curl xz-utils grep coreutils
+          sudo apt-get install -y qemu-user-static binfmt-support curl xz-utils grep coreutils jq curl xz-utils grep coreutils
 
+      - name: 📦 Fetch rootfs
+        run: |
           echo "📡 Fetching rootfs metadata..."
           DOWNLOAD_SERVER="images.linuxcontainers.org"
           DOWNLOAD_INDEX_PATH="/meta/1.0/index-system"
@@ -48,6 +50,9 @@ jobs:
             sudo mkdir -p /opt/chroot/debian-bookworm-armhf/$dir
             sudo mount --bind /$dir /opt/chroot/debian-bookworm-armhf/$dir
           done
+
+          echo "📦 Copying qemu-arm-static into chroot..."
+          sudo cp /usr/bin/qemu-arm-static /opt/chroot/debian-bookworm-armhf/usr/bin/
 
       - name: 🧪 Build inside chroot
         run: |
