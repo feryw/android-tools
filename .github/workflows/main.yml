@@ -48,6 +48,8 @@ jobs:
 
           echo "📦 Copying qemu-arm-static into chroot..."
           sudo cp /usr/bin/qemu-arm-static /opt/chroot/ubuntu-jammy-armhf/usr/bin/
+          echo "nameserver 1.1.1.1" | sudo tee /opt/chroot/ubuntu-jammy-armhf/etc/resolv.conf
+          echo "nameserver 8.8.8.8" | sudo tee -a /opt/chroot/ubuntu-jammy-armhf/etc/resolv.conf
 
       - name: 🧪 Build inside chroot
         run: |
