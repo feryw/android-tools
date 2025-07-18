@@ -26,7 +26,7 @@ jobs:
           DOWNLOAD_DISTRO="debian;bookworm;${DISTRO_ARCH};default"
 
           ROOTFS_URL="https://$DOWNLOAD_SERVER$(curl -fsSL https://$DOWNLOAD_SERVER$DOWNLOAD_INDEX_PATH | \
-            grep \"$DOWNLOAD_DISTRO\" | cut -f6 -d';')rootfs.tar.xz"
+            grep \"$DOWNLOAD_DISTRO\" | cut -f6 -d';')/rootfs.tar.xz"
 
           echo "✅ Resolved rootfs URL: $ROOTFS_URL"
 
