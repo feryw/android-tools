@@ -72,10 +72,12 @@ jobs:
             staticx --debug /artifacts/prebin/fastboot /artifacts/bin/fastboot
             cd /artifacts
             tar -czvf android-tools-armhf-${GITHUB_REF##*/}.tar.gz bin
+            find
           "
 
       - name: 📤 Copy full source tree archive from chroot
         run: |
+          find /opt/chroot/ubuntu-jammy-armhf/artifacts
           cp /opt/chroot/ubuntu-jammy-armhf/artifacts/android-tools-armhf-${GITHUB_REF##*/}.tar.gz .
 
       - name: 🆙 Determine next version tag
@@ -96,7 +98,7 @@ jobs:
       - name: 🚀 Upload release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: static android-tools-armhf-${{ github.ref_name }}.tar.gz
+          artifacts: android-tools-armhf-${{ github.ref_name }}.tar.gz
           tag: ${{ env.VERSION_TAG }}
           name: ${{ env.VERSION_TAG }}
           body: "✅ Built inside Ubuntu Jammy armhf chroot\nIncludes: adb, adbd, fastboot static binaries only"
