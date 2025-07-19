@@ -66,7 +66,8 @@ jobs:
             mkdir -p /artifacts/bin
             cp adbd /artifacts/prebin/
             staticx --strip /artifacts/prebin/adbd /artifacts/bin/adbd
-            chmod r+x /artifacts/bin/adbd
+            ls -al /artifacts/bin
+            chmod 644 /artifacts/bin/adbd
             file /artifacts/prebin/adbd
             file /artifacts/bin/adbd
           "
