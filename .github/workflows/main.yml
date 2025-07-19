@@ -73,8 +73,8 @@ jobs:
 
       - name: 📤 Copy full source tree archive from chroot
         run: |
-          find /opt/chroot/ubuntu-jammy-armhf/artifacts
-          sudo cp /opt/chroot/ubuntu-jammy-armhf/artifacts/bin/adbd .
+          find /opt/chroot/ubuntu-jammy-armhf/artifacts/bin
+          cp /opt/chroot/ubuntu-jammy-armhf/artifacts/bin/adbd .
 
       - name: 🆙 Determine next version tag
         id: version
@@ -94,7 +94,7 @@ jobs:
       - name: 🚀 Upload release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: adbd
+          artifacts: ./adbd
           tag: ${{ env.VERSION_TAG }}
           name: ${{ env.VERSION_TAG }}
           body: "✅ adbd static armv7/armhf binaries only"
