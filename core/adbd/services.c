@@ -310,7 +310,7 @@ static int create_subprocess(const char *cmd, const char *arg0, const char *arg1
 
         // set OOM adjustment to zero
         char text[64];
-        snprintf(text, sizeof text, "/proc/%d/oom_adj", getpid());
+        snprintf(text, sizeof text, "/proc/%d/oom_score_adj", getpid());
         int fd = adb_open(text, O_WRONLY);
         if (fd >= 0) {
             adb_write(fd, "0", 1);
@@ -325,8 +325,8 @@ static int create_subprocess(const char *cmd, const char *arg0, const char *arg1
     } else {
         // Don't set child's OOM adjustment to zero.
         // Let the child do it itself, as sometimes the parent starts
-        // running before the child has a /proc/pid/oom_adj.
-        // """adb: unable to open /proc/644/oom_adj""" seen in some logs.
+        // running before the child has a /proc/pid/oom_score_adj.
+        // """adb: unable to open /proc/644/oom_score_adj""" seen in some logs.
         return ptm;
     }
 #endif /* !HAVE_WIN32_PROC */
