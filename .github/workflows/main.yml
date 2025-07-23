@@ -23,7 +23,7 @@ jobs:
         run: |
           echo "📡 Fetching rootfs metadata..."
           DOWNLOAD_SERVER="images.linuxcontainers.org"
-          ROOTFS_URL="https://$DOWNLOAD_SERVER//images/ubuntu/jammy/armhf/default/20250715_08:28//rootfs.tar.xz"
+          ROOTFS_URL="https://$DOWNLOAD_SERVER/images/ubuntu/jammy/armhf/default/20250721_08:03/rootfs.tar.xz"
           echo "✅ Resolved rootfs URL: $ROOTFS_URL"
 
           mkdir -p /opt/chroot
