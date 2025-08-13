@@ -20,7 +20,9 @@
 #include <string.h>
 #include <errno.h>
 #include <pwd.h>
+#ifdef __GLIBC__
 #include <sys/cdefs.h>
+#endif
 
 #include "sysdeps.h"
 
